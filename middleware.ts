@@ -1,11 +1,9 @@
 
 import { NextResponse, type NextRequest } from 'next/server';
-import { getSession } from '@/lib/auth';
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // This is a workaround to get session on the server in middleware
   const sessionCookie = request.cookies.get('taskzen_session')?.value;
   const session = sessionCookie ? JSON.parse(sessionCookie) : null;
   
@@ -18,10 +16,6 @@ export async function middleware(request: NextRequest) {
     return null;
   }
 
-  if (!pathname.startsWith('/dashboard')) {
-    return NextResponse.redirect(new URL('/dashboard', request.url));
-  }
-
   if (!session) {
     let from = pathname;
     if (request.nextUrl.search) {
@@ -29,6 +23,14 @@ export async function middleware(request: NextRequest) {
     }
     
     return NextResponse.redirect(new URL(`/login?from=${encodeURIComponent(from)}`, request.url));
+  }
+  
+  if (pathname.startsWith('/dashboard/users') && session.role !== 'Super Admin' && session.role !== 'Admin') {
+    return NextResponse.redirect(new URL('/dashboard', request.url));
+  }
+
+  if (pathname === '/') {
+    return NextResponse.redirect(new URL('/dashboard', request.url));
   }
 
   return NextResponse.next();
