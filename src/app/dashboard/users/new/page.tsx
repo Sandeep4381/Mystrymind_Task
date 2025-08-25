@@ -25,19 +25,13 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { useTransition } from 'react';
 import { Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-
-const userFormSchema = z.object({
-  name: z.string().min(1, 'Name is required.'),
-  email: z.string().email('Invalid email address.'),
-  mobile: z.string().optional(),
-  position: z.string().optional(),
-  password: z.string().min(6, 'Password must be at least 6 characters.'),
-  role: z.enum(['Admin', 'User', 'Super Admin']),
-});
+import { createUser, userFormSchema } from './actions';
+import { useRouter } from 'next/navigation';
 
 export default function NewUserPage() {
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof userFormSchema>>({
     resolver: zodResolver(userFormSchema),
@@ -51,15 +45,21 @@ export default function NewUserPage() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof userFormSchema>) {
-    startTransition(() => {
-      // In a real app, you would call a server action to create the user
-      console.log(values);
-      toast({
-        title: 'User Created',
-        description: 'The new user has been successfully created.',
-      });
-      // a router.push('/dashboard/users') would go here
+  async function onSubmit(values: z.infer<typeof userFormSchema>) {
+    startTransition(async () => {
+      const result = await createUser(values);
+      if (result?.error) {
+        toast({
+          variant: 'destructive',
+          title: 'User Creation Failed',
+          description: result.error,
+        });
+      } else {
+        toast({
+          title: 'User Created',
+          description: 'The new user has been successfully created.',
+        });
+      }
     });
   }
 
@@ -161,7 +161,8 @@ export default function NewUserPage() {
                   </FormItem>
                 )}
               />
-            <div className="flex justify-end pt-4">
+            <div className="flex justify-end pt-4 gap-2">
+              <Button type="button" variant="outline" onClick={() => router.back()}>Cancel</Button>
               <Button type="submit" disabled={isPending}>
                 {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Create User
