@@ -34,5 +34,12 @@
     "email": "ava@taskzen.com",
     "password": "password123",
     "role": "User"
+  },
+  {
+    "id": "user-6",
+    "name": "Sandeep Kumar",
+    "email": "singhsandeepkumar008@gmail.com",
+    "password": "Task@4381",
+    "role": "Super Admin"
   }
 ]
