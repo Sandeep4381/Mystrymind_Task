@@ -25,8 +25,17 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { useTransition } from 'react';
 import { Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { createUser, userFormSchema } from './actions';
+import { createUser } from './actions';
 import { useRouter } from 'next/navigation';
+
+const userFormSchema = z.object({
+  name: z.string().min(1, 'Name is required.'),
+  email: z.string().email('Invalid email address.'),
+  mobile: z.string().optional(),
+  position: z.string().optional(),
+  password: z.string().min(6, 'Password must be at least 6 characters.'),
+  role: z.enum(['Admin', 'User', 'Super Admin']),
+});
 
 export default function NewUserPage() {
   const [isPending, startTransition] = useTransition();

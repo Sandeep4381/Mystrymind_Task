@@ -6,7 +6,7 @@ import { redirect } from 'next/navigation';
 import { addUser, getUserByEmail } from '@/lib/data';
 import { revalidatePath } from 'next/cache';
 
-export const userFormSchema = z.object({
+const userFormSchema = z.object({
   name: z.string().min(1, 'Name is required.'),
   email: z.string().email('Invalid email address.'),
   mobile: z.string().optional(),
