@@ -31,7 +31,8 @@ interface UsersDataTableProps {
 
 const getInitials = (name: string) => {
     const names = name.split(' ');
-    return names.map((n) => n[0]).join('');
+    if (names.length === 0) return '';
+    return names.map((n) => n[0]).join('').toUpperCase();
 }
 
 export function UsersDataTable({ users }: UsersDataTableProps) {
