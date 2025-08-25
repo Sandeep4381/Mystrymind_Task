@@ -5,5 +5,14 @@
     "email": "singhsandeepkumar008@gmail.com",
     "password": "Task@4381",
     "role": "Super Admin"
+  },
+  {
+    "id": "user-1756146644907",
+    "name": "Sandeep Kumar Singh",
+    "email": "sandeep.s@gmail.com",
+    "mobile": "0299435686",
+    "position": "",
+    "password": "Sky@4381",
+    "role": "Admin"
   }
 ]
