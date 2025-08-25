@@ -1,0 +1,38 @@
+
+[
+  {
+    "id": "user-1",
+    "name": "Sophia Davis",
+    "email": "superadmin@taskzen.com",
+    "password": "password123",
+    "role": "Super Admin"
+  },
+  {
+    "id": "user-2",
+    "name": "Liam Rodriguez",
+    "email": "admin@taskzen.com",
+    "password": "password123",
+    "role": "Admin"
+  },
+  {
+    "id": "user-3",
+    "name": "Olivia Martinez",
+    "email": "user@taskzen.com",
+    "password": "password123",
+    "role": "User"
+  },
+  {
+    "id": "user-4",
+    "name": "Noah Thompson",
+    "email": "noah@taskzen.com",
+    "password": "password123",
+    "role": "User"
+  },
+  {
+    "id": "user-5",
+    "name": "Ava Wilson",
+    "email": "ava@taskzen.com",
+    "password": "password123",
+    "role": "User"
+  }
+]
