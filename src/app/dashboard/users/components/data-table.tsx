@@ -12,6 +12,18 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { type User } from "@/lib/definitions";
+import { MoreHorizontal } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useRouter } from "next/navigation";
+
 
 interface UsersDataTableProps {
   users: User[];
@@ -23,6 +35,23 @@ const getInitials = (name: string) => {
 }
 
 export function UsersDataTable({ users }: UsersDataTableProps) {
+  const router = useRouter();
+
+  const handleViewProfile = (userId: string) => {
+    // In a real app, this would navigate to a detailed user profile page
+    console.log(`Viewing profile for user ${userId}`);
+  };
+
+  const handleEditUser = (userId: string) => {
+    // In a real app, this would open an edit user modal or page
+    console.log(`Editing user ${userId}`);
+  };
+
+  const handleDeleteUser = (userId: string) => {
+    // In a real app, this would show a confirmation and then delete the user
+    console.log(`Deleting user ${userId}`);
+  };
+
   return (
      <div className="rounded-md border bg-card">
         <Table>
@@ -31,6 +60,7 @@ export function UsersDataTable({ users }: UsersDataTableProps) {
               <TableHead>Name</TableHead>
               <TableHead>Email</TableHead>
               <TableHead>Role</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -50,11 +80,35 @@ export function UsersDataTable({ users }: UsersDataTableProps) {
                   <TableCell>
                     <Badge variant={user.role === 'Super Admin' ? 'default' : 'secondary'}>{user.role}</Badge>
                   </TableCell>
+                  <TableCell className="text-right">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0">
+                          <span className="sr-only">Open menu</span>
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        <DropdownMenuItem onClick={() => handleViewProfile(user.id)}>
+                          View Profile
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleEditUser(user.id)}>Edit</DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          className="text-destructive"
+                          onClick={() => handleDeleteUser(user.id)}
+                        >
+                          Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={3} className="h-24 text-center">
+                <TableCell colSpan={4} className="h-24 text-center">
                   No users found.
                 </TableCell>
               </TableRow>

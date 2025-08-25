@@ -5,6 +5,8 @@ export type User = {
   email: string;
   password?: string;
   role: 'Super Admin' | 'Admin' | 'User';
+  mobile?: string;
+  position?: string;
 };
 
 export type Task = {

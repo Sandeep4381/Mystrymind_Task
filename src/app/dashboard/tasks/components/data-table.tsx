@@ -19,11 +19,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Bug,
   CircleHelp,
@@ -35,15 +35,18 @@ import {
   ArrowDown,
   ArrowRight,
   ArrowUp,
+  MoreHorizontal,
 } from "lucide-react";
-import { type Task, type User } from "@/lib/definitions";
+import { type Task, type User, type SessionUser } from "@/lib/definitions";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 
 interface TasksDataTableProps {
   tasks: Task[];
   users: User[];
+  session: SessionUser;
 }
 
 const statusIcons = {
@@ -71,9 +74,9 @@ const getInitials = (name: string) => {
     return names.map((n) => n[0]).join('');
 }
 
-
-export function TasksDataTable({ tasks, users }: TasksDataTableProps) {
+export function TasksDataTable({ tasks, users, session }: TasksDataTableProps) {
   const router = useRouter();
+  const isAdmin = session.role === "Admin" || session.role === "Super Admin";
 
   return (
      <div className="rounded-md border bg-card">
@@ -84,6 +87,7 @@ export function TasksDataTable({ tasks, users }: TasksDataTableProps) {
               <TableHead>Status</TableHead>
               <TableHead>Priority</TableHead>
               <TableHead>Assignee</TableHead>
+              {isAdmin && <TableHead className="text-right">Actions</TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -118,7 +122,7 @@ export function TasksDataTable({ tasks, users }: TasksDataTableProps) {
                       </div>
                     </TableCell>
                     <TableCell onClick={(e) => e.stopPropagation()}>
-                       <Select defaultValue={assignee?.id}>
+                       <Select defaultValue={assignee?.id} disabled={!isAdmin}>
                         <SelectTrigger className="w-[180px]">
                            <div className="flex items-center gap-2">
                                {assignee ? (
@@ -149,12 +153,28 @@ export function TasksDataTable({ tasks, users }: TasksDataTableProps) {
                         </SelectContent>
                       </Select>
                     </TableCell>
+                    {isAdmin && (
+                        <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
+                           <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" size="icon">
+                                        <MoreHorizontal className="h-4 w-4" />
+                                        <span className="sr-only">Task Actions</span>
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                    <DropdownMenuItem>Edit</DropdownMenuItem>
+                                    <DropdownMenuItem className="text-destructive">Delete</DropdownMenuItem>
+                                </DropdownMenuContent>
+                           </DropdownMenu>
+                        </TableCell>
+                    )}
                   </TableRow>
                 );
               })
             ) : (
               <TableRow>
-                <TableCell colSpan={4} className="h-24 text-center">
+                <TableCell colSpan={isAdmin ? 5: 4} className="h-24 text-center">
                   No tasks found.
                 </TableCell>
               </TableRow>
