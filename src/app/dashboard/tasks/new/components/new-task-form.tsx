@@ -128,14 +128,17 @@ export function NewTaskForm({ users }: NewTaskFormProps) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Assign To</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value ?? ''}>
+                  <Select 
+                    onValueChange={(value) => field.onChange(value === 'unassigned' ? null : value)} 
+                    defaultValue={field.value ?? 'unassigned'}
+                  >
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select a user to assign the task" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="">Unassigned</SelectItem>
+                      <SelectItem value="unassigned">Unassigned</SelectItem>
                       {users.map((user) => (
                         <SelectItem key={user.id} value={user.id}>
                           <div className="flex items-center gap-2">
