@@ -26,7 +26,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { useTransition } from 'react';
 import { Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { createTask, taskFormSchema } from '../actions';
+import { createTask } from '../actions';
 import { type User } from '@/lib/definitions';
 import { useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -35,6 +35,15 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 interface NewTaskFormProps {
     users: User[];
 }
+
+const taskFormSchema = z.object({
+  title: z.string().min(1, 'Title is required.'),
+  description: z.string().min(1, 'Description is required.'),
+  status: z.enum(['Backlog', 'Todo', 'In Progress', 'Done', 'Canceled']),
+  label: z.enum(['bug', 'feature', 'documentation']),
+  priority: z.enum(['low', 'medium', 'high']),
+  assigneeId: z.string().nullable(),
+});
 
 const getInitials = (name: string) => {
     const names = name.split(' ');

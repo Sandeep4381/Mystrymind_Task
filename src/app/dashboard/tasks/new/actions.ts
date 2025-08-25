@@ -10,7 +10,7 @@ import path from 'path';
 
 const tasksFilePath = path.join(process.cwd(), 'data/tasks.json');
 
-export const taskFormSchema = z.object({
+const taskFormSchema = z.object({
   title: z.string().min(1, 'Title is required.'),
   description: z.string().min(1, 'Description is required.'),
   status: z.enum(['Backlog', 'Todo', 'In Progress', 'Done', 'Canceled']),
