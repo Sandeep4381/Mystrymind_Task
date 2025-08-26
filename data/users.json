@@ -14,5 +14,14 @@
     "position": "",
     "password": "Sky@4381",
     "role": "Admin"
+  },
+  {
+    "id": "user-1756147278986",
+    "name": "Ajay",
+    "email": "ajay@gmail.com",
+    "mobile": "2994356861",
+    "position": "Project manager ",
+    "password": "Sky@4381",
+    "role": "User"
   }
 ]

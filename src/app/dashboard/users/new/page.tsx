@@ -22,8 +22,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { useTransition } from 'react';
-import { Loader2 } from 'lucide-react';
+import { useState, useTransition } from 'react';
+import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { createUser } from './actions';
 import { useRouter } from 'next/navigation';
@@ -39,6 +39,7 @@ const userFormSchema = z.object({
 
 export default function NewUserPage() {
   const [isPending, startTransition] = useTransition();
+  const [showPassword, setShowPassword] = useState(false);
   const { toast } = useToast();
   const router = useRouter();
 
@@ -142,7 +143,23 @@ export default function NewUserPage() {
                 <FormItem>
                   <FormLabel>Password</FormLabel>
                   <FormControl>
-                    <Input type="password" placeholder="••••••••" {...field} />
+                    <div className="relative">
+                      <Input 
+                        type={showPassword ? 'text' : 'password'} 
+                        placeholder="••••••••" 
+                        {...field} 
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="absolute inset-y-0 right-0 h-full px-3"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? <EyeOff /> : <Eye />}
+                        <span className="sr-only">{showPassword ? 'Hide password' : 'Show password'}</span>
+                      </Button>
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>

@@ -39,8 +39,7 @@ export function UsersDataTable({ users }: UsersDataTableProps) {
   const router = useRouter();
 
   const handleViewProfile = (userId: string) => {
-    // In a real app, this would navigate to a detailed user profile page
-    console.log(`Viewing profile for user ${userId}`);
+    router.push(`/dashboard/users/${userId}`);
   };
 
   const handleEditUser = (userId: string) => {
