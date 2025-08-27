@@ -1,1 +1,11 @@
-[]
+[
+  {
+    "id": "user-1718886948052",
+    "name": "Sandeep Kumar Singh",
+    "email": "singhsandeepkumar008@gmail.com",
+    "password": "Sky@4381",
+    "role": "Super Admin",
+    "mobile": "9876543210",
+    "position": "Lead Developer"
+  }
+]
