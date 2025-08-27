@@ -90,14 +90,14 @@ export function UsersDataTable({ users }: UsersDataTableProps) {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem onClick={() => handleViewProfile(user.id)}>
+                        <DropdownMenuItem onClick={() => router.push(`/dashboard/users/${user.id}`)}>
                           View Profile
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleEditUser(user.id)}>Edit</DropdownMenuItem>
+                        <DropdownMenuItem disabled>Edit</DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
                           className="text-destructive"
-                          onClick={() => handleDeleteUser(user.id)}
+                          disabled
                         >
                           Delete
                         </DropdownMenuItem>
