@@ -59,7 +59,7 @@ export function NewTaskForm({ users, projects }: NewTaskFormProps) {
   const router = useRouter();
 
   const form = useForm<z.infer<typeof taskFormSchema>>({
-    resolver: zodResolver(taskFormSchema),
+    resolver: zodResolver(taskFmSchema),
     defaultValues: {
       title: '',
       description: '',
@@ -73,7 +73,11 @@ export function NewTaskForm({ users, projects }: NewTaskFormProps) {
 
   async function onSubmit(values: z.infer<typeof taskFormSchema>) {
     startTransition(async () => {
-      const result = await createTask(values);
+      const result = await createTask({
+        ...values,
+        projectId: values.projectId === 'unassigned' ? null : values.projectId,
+        assigneeId: values.assigneeId === 'unassigned' ? null : values.assigneeId,
+      });
        if (result?.error) {
         toast({
           variant: 'destructive',
@@ -133,7 +137,7 @@ export function NewTaskForm({ users, projects }: NewTaskFormProps) {
                     <FormItem>
                       <FormLabel>Project</FormLabel>
                       <Select 
-                        onValueChange={(value) => field.onChange(value === 'unassigned' ? null : value)} 
+                        onValueChange={field.onChange}
                         defaultValue={field.value ?? 'unassigned'}
                       >
                         <FormControl>
@@ -161,7 +165,7 @@ export function NewTaskForm({ users, projects }: NewTaskFormProps) {
                     <FormItem>
                       <FormLabel>Assign To</FormLabel>
                       <Select 
-                        onValueChange={(value) => field.onChange(value === 'unassigned' ? null : value)} 
+                        onValueChange={field.onChange}
                         defaultValue={field.value ?? 'unassigned'}
                       >
                         <FormControl>
@@ -274,3 +278,5 @@ export function NewTaskForm({ users, projects }: NewTaskFormProps) {
     </Card>
   );
 }
+
+    
