@@ -32,7 +32,7 @@ export default async function UsersPage() {
             </Link>
          </Button>
        </div>
-       <UsersDataTable users={users} />
+       <UsersDataTable users={users} session={session} />
     </div>
   );
 }

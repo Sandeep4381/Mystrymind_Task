@@ -11,8 +11,8 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { type User } from "@/lib/definitions";
-import { MoreHorizontal } from "lucide-react";
+import { type User, type SessionUser } from "@/lib/definitions";
+import { MoreHorizontal, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
@@ -27,6 +27,7 @@ import { useRouter } from "next/navigation";
 
 interface UsersDataTableProps {
   users: User[];
+  session: SessionUser;
 }
 
 const getInitials = (name: string) => {
@@ -35,8 +36,20 @@ const getInitials = (name: string) => {
     return names.map((n) => n[0]).join('').toUpperCase();
 }
 
-export function UsersDataTable({ users }: UsersDataTableProps) {
+export function UsersDataTable({ users, session }: UsersDataTableProps) {
   const router = useRouter();
+
+  const canPerformAction = (targetUser: User) => {
+    if (session.role === 'Super Admin') {
+        // Super Admin can't delete themselves
+        return session.id !== targetUser.id;
+    }
+    if (session.role === 'Admin') {
+        // Admin can only manage Users
+        return targetUser.role === 'User';
+    }
+    return false;
+  }
 
   return (
      <div className="rounded-md border bg-card">
@@ -77,13 +90,14 @@ export function UsersDataTable({ users }: UsersDataTableProps) {
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuItem onClick={() => router.push(`/dashboard/users/${user.id}`)}>
+                          <Eye className="mr-2 h-4 w-4" />
                           View Profile
                         </DropdownMenuItem>
-                        <DropdownMenuItem disabled>Edit</DropdownMenuItem>
+                        <DropdownMenuItem disabled={!canPerformAction(user)}>Edit</DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
                           className="text-destructive"
-                          disabled
+                          disabled={!canPerformAction(user)}
                         >
                           Delete
                         </DropdownMenuItem>
