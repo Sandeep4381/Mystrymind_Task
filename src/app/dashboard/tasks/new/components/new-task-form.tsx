@@ -70,7 +70,7 @@ export function NewTaskForm({ users, projects }: NewTaskFormProps) {
     },
   });
 
-  const onSubmit = (values: z.infer<typeof taskFormSchema>) => {
+  async function onSubmit(values: z.infer<typeof taskFormSchema>) {
     startTransition(async () => {
       const result = await createTask({
         ...values,
@@ -90,7 +90,7 @@ export function NewTaskForm({ users, projects }: NewTaskFormProps) {
         });
       }
     });
-  };
+  }
 
   return (
     <Card>
@@ -135,9 +135,9 @@ export function NewTaskForm({ users, projects }: NewTaskFormProps) {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Project</FormLabel>
-                      <Select 
+                      <Select
                         onValueChange={field.onChange}
-                        defaultValue={field.value ?? 'unassigned'}
+                        defaultValue={field.value ?? undefined}
                       >
                         <FormControl>
                           <SelectTrigger>
@@ -163,9 +163,9 @@ export function NewTaskForm({ users, projects }: NewTaskFormProps) {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Assign To</FormLabel>
-                      <Select 
+                      <Select
                         onValueChange={field.onChange}
-                        defaultValue={field.value ?? 'unassigned'}
+                        defaultValue={field.value ?? undefined}
                       >
                         <FormControl>
                           <SelectTrigger>
@@ -192,7 +192,7 @@ export function NewTaskForm({ users, projects }: NewTaskFormProps) {
                   )}
                 />
             </div>
-            
+
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <FormField
