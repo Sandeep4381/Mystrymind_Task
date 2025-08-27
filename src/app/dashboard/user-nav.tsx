@@ -18,6 +18,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { logout } from '@/app/login/actions';
 import { type SessionUser } from '@/lib/definitions';
+import Link from 'next/link';
 
 interface UserNavProps {
   user: SessionUser;
@@ -50,8 +51,12 @@ export function UserNav({ user }: UserNavProps) {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem disabled>Profile</DropdownMenuItem>
-          <DropdownMenuItem disabled>Settings</DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link href={`/dashboard/users/${user.id}`}>Profile</Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link href="/dashboard/settings">Settings</Link>
+          </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <form action={logout} className="w-full">
