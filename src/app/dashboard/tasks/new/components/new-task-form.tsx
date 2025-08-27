@@ -90,7 +90,7 @@ export function NewTaskForm({ users, projects }: NewTaskFormProps) {
         });
       }
     });
-  }
+  };
 
   return (
     <Card>
