@@ -5,6 +5,8 @@ import { z } from 'zod';
 import { redirect } from 'next/navigation';
 import { addUser, getUserByEmail } from '@/lib/data';
 import { revalidatePath } from 'next/cache';
+import { sendWelcomeEmail } from '@/lib/email';
+import { getSession } from '@/lib/auth';
 
 const userFormSchema = z.object({
   name: z.string().min(1, 'Name is required.'),
@@ -17,13 +19,18 @@ const userFormSchema = z.object({
 
 
 export async function createUser(values: z.infer<typeof userFormSchema>) {
+  const session = await getSession();
+  if (!session) {
+    return { error: 'You must be logged in to create a user.' };
+  }
+  
   const parsedCredentials = userFormSchema.safeParse(values);
 
   if (!parsedCredentials.success) {
     return { error: 'Invalid user data provided.' };
   }
 
-  const { email } = parsedCredentials.data;
+  const { email, name, password } = parsedCredentials.data;
   const existingUser = await getUserByEmail(email);
 
   if (existingUser) {
@@ -31,9 +38,20 @@ export async function createUser(values: z.infer<typeof userFormSchema>) {
   }
 
   try {
-    await addUser(parsedCredentials.data);
+    const newUser = await addUser(parsedCredentials.data);
+
+    await sendWelcomeEmail({
+        to: newUser.email,
+        newUserName: newUser.name,
+        createdByName: session.name,
+        password: password,
+    });
+
   } catch (error) {
     console.error(error);
+    if (error instanceof Error && error.message.includes('SMTP')) {
+         return { error: `Failed to send notification email. Please check your SMTP settings in the .env file. [${error.message}]` };
+    }
     return { error: 'Failed to create user.' };
   }
 
