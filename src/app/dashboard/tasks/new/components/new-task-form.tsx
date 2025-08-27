@@ -229,7 +229,7 @@ export function NewTaskForm({ users, projects }: NewTaskFormProps) {
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select a priority" />
-                        </SelectTrigger>
+                        </Trigger>
                       </FormControl>
                       <SelectContent>
                         <SelectItem value="low">Low</SelectItem>
