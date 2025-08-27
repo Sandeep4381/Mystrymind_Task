@@ -38,20 +38,6 @@ const getInitials = (name: string) => {
 export function UsersDataTable({ users }: UsersDataTableProps) {
   const router = useRouter();
 
-  const handleViewProfile = (userId: string) => {
-    router.push(`/dashboard/users/${userId}`);
-  };
-
-  const handleEditUser = (userId: string) => {
-    // In a real app, this would open an edit user modal or page
-    console.log(`Editing user ${userId}`);
-  };
-
-  const handleDeleteUser = (userId: string) => {
-    // In a real app, this would show a confirmation and then delete the user
-    console.log(`Deleting user ${userId}`);
-  };
-
   return (
      <div className="rounded-md border bg-card">
         <Table>
