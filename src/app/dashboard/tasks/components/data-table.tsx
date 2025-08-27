@@ -25,6 +25,16 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
+import {
   Bug,
   CircleHelp,
   FileText,
@@ -36,12 +46,17 @@ import {
   ArrowRight,
   ArrowUp,
   MoreHorizontal,
+  Trash2,
+  Loader2
 } from "lucide-react";
 import { type Task, type User, type SessionUser } from "@/lib/definitions";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { deleteTaskAction } from "../actions";
+import { useToast } from "@/hooks/use-toast";
+
 
 interface TasksDataTableProps {
   tasks: Task[];
@@ -76,9 +91,36 @@ const getInitials = (name: string) => {
 
 export function TasksDataTable({ tasks, users, session }: TasksDataTableProps) {
   const router = useRouter();
+  const { toast } = useToast();
+  const [isPending, startTransition] = React.useTransition();
+  const [showDeleteDialog, setShowDeleteDialog] = React.useState(false);
+  const [taskToDelete, setTaskToDelete] = React.useState<Task | null>(null);
+
   const isAdmin = session.role === "Admin" || session.role === "Super Admin";
 
+  const handleDelete = () => {
+    if (!taskToDelete) return;
+    startTransition(async () => {
+        const result = await deleteTaskAction(taskToDelete.id);
+        if (result.error) {
+            toast({
+                variant: 'destructive',
+                title: 'Deletion Failed',
+                description: result.error,
+            });
+        } else {
+            toast({
+                title: 'Task Deleted',
+                description: `Task "${taskToDelete.title}" has been deleted.`,
+            });
+        }
+        setShowDeleteDialog(false);
+        setTaskToDelete(null);
+    });
+  };
+
   return (
+    <>
      <div className="rounded-md border bg-card">
         <Table>
           <TableHeader>
@@ -164,7 +206,17 @@ export function TasksDataTable({ tasks, users, session }: TasksDataTableProps) {
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
                                     <DropdownMenuItem>Edit</DropdownMenuItem>
-                                    <DropdownMenuItem className="text-destructive">Delete</DropdownMenuItem>
+                                    <DropdownMenuItem 
+                                        className="text-destructive"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setTaskToDelete(task);
+                                            setShowDeleteDialog(true);
+                                        }}
+                                    >
+                                        <Trash2 className="mr-2 h-4 w-4"/>
+                                        Delete
+                                    </DropdownMenuItem>
                                 </DropdownMenuContent>
                            </DropdownMenu>
                         </TableCell>
@@ -182,5 +234,28 @@ export function TasksDataTable({ tasks, users, session }: TasksDataTableProps) {
           </TableBody>
         </Table>
      </div>
+     <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+            <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+                This action cannot be undone. This will permanently delete the task
+                "{taskToDelete?.title}".
+            </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+                onClick={handleDelete}
+                disabled={isPending}
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+                {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Delete
+            </AlertDialogAction>
+            </AlertDialogFooter>
+        </AlertDialogContent>
+     </AlertDialog>
+    </>
   );
 }

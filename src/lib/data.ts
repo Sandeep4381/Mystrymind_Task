@@ -67,6 +67,12 @@ export async function getTaskById(taskId: string): Promise<Task | undefined> {
   return tasks.find(task => task.id === taskId);
 }
 
+export async function deleteTask(taskId: string): Promise<void> {
+    const tasks = await getTasks();
+    const updatedTasks = tasks.filter(task => task.id !== taskId);
+    await writeJSONFile(tasksFilePath, updatedTasks);
+}
+
 export async function getProjects(): Promise<Project[]> {
     const projects = await readJSONFile(projectsFilePath);
     return projects as Project[];
