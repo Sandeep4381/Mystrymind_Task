@@ -59,7 +59,7 @@ export function NewTaskForm({ users, projects }: NewTaskFormProps) {
   const router = useRouter();
 
   const form = useForm<z.infer<typeof taskFormSchema>>({
-    resolver: zodResolver(taskFmSchema),
+    resolver: zodResolver(taskFormSchema),
     defaultValues: {
       title: '',
       description: '',
@@ -278,5 +278,3 @@ export function NewTaskForm({ users, projects }: NewTaskFormProps) {
     </Card>
   );
 }
-
-    
