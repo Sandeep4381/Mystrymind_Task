@@ -1,0 +1,38 @@
+[
+  {
+    "id": "user-1718886948052",
+    "name": "Sandeep Kumar Singh",
+    "email": "singhsandeepkumar008@gmail.com",
+    "password": "Task@4381",
+    "role": "Super Admin",
+    "mobile": "6299435686",
+    "position": "Lead Developer"
+  },
+  {
+    "id": "user-1756290777553",
+    "name": "sandeep kumar singh",
+    "email": "sandeep.s@vtechsolution.com",
+    "mobile": "6299435686",
+    "position": "junior ",
+    "password": "Sky@4381",
+    "role": "User"
+  },
+  {
+    "id": "user-1756290900546",
+    "name": "sandeep kumar singh",
+    "email": "sandeep.svtech@gmail.com",
+    "mobile": "6299435686",
+    "position": "junior ",
+    "password": "Sky@4381",
+    "role": "Admin"
+  },
+  {
+    "id": "user-1756291060094",
+    "name": "Ajay Mourya ",
+    "email": "mouryaajay7463@gmail.com",
+    "mobile": "7463911089",
+    "position": "Full stack Mobile developer",
+    "password": "Ajay@7463",
+    "role": "Admin"
+  }
+]
