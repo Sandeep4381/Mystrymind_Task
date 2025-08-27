@@ -70,7 +70,7 @@ export function NewTaskForm({ users, projects }: NewTaskFormProps) {
     },
   });
 
-  async function onSubmit(values: z.infer<typeof taskFormSchema>) {
+  const onSubmit = (values: z.infer<typeof taskFormSchema>) => {
     startTransition(async () => {
       const result = await createTask({
         ...values,
