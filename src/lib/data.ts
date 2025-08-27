@@ -72,6 +72,12 @@ export async function getProjects(): Promise<Project[]> {
     return projects as Project[];
 }
 
+export async function getProjectById(projectId: string): Promise<Project | undefined> {
+    const projects = await getProjects();
+    return projects.find(p => p.id === projectId);
+}
+
+
 export async function addProject(project: Omit<Project, 'id'>): Promise<Project> {
     const projects = await getProjects();
     const newProject: Project = {
