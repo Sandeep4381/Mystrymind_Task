@@ -27,13 +27,14 @@ import { useTransition } from 'react';
 import { Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { createTask } from '../actions';
-import { type User } from '@/lib/definitions';
+import { type User, type Project } from '@/lib/definitions';
 import { useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 
 interface NewTaskFormProps {
     users: User[];
+    projects: Project[];
 }
 
 const taskFormSchema = z.object({
@@ -43,6 +44,7 @@ const taskFormSchema = z.object({
   label: z.enum(['bug', 'feature', 'documentation']),
   priority: z.enum(['low', 'medium', 'high']),
   assigneeId: z.string().nullable(),
+  projectId: z.string().nullable(),
 });
 
 const getInitials = (name: string) => {
@@ -51,7 +53,7 @@ const getInitials = (name: string) => {
 }
 
 
-export function NewTaskForm({ users }: NewTaskFormProps) {
+export function NewTaskForm({ users, projects }: NewTaskFormProps) {
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
   const router = useRouter();
@@ -65,6 +67,7 @@ export function NewTaskForm({ users }: NewTaskFormProps) {
       label: 'feature',
       priority: 'medium',
       assigneeId: null,
+      projectId: null,
     },
   });
 
@@ -121,41 +124,72 @@ export function NewTaskForm({ users }: NewTaskFormProps) {
                 </FormItem>
               )}
             />
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FormField
+                  control={form.control}
+                  name="projectId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Project</FormLabel>
+                      <Select 
+                        onValueChange={(value) => field.onChange(value === 'unassigned' ? null : value)} 
+                        defaultValue={field.value ?? 'unassigned'}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a project" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="unassigned">No Project</SelectItem>
+                          {projects.map((project) => (
+                            <SelectItem key={project.id} value={project.id}>
+                              {project.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="assigneeId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Assign To</FormLabel>
+                      <Select 
+                        onValueChange={(value) => field.onChange(value === 'unassigned' ? null : value)} 
+                        defaultValue={field.value ?? 'unassigned'}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a user to assign the task" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="unassigned">Unassigned</SelectItem>
+                          {users.map((user) => (
+                            <SelectItem key={user.id} value={user.id}>
+                              <div className="flex items-center gap-2">
+                                <Avatar className="h-6 w-6">
+                                    <AvatarImage src={`https://picsum.photos/seed/${user.id}/40/40`} alt={user.name} data-ai-hint="avatar" />
+                                    <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
+                                </Avatar>
+                                <span>{user.name}</span>
+                               </div>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+            </div>
             
-            <FormField
-              control={form.control}
-              name="assigneeId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Assign To</FormLabel>
-                  <Select 
-                    onValueChange={(value) => field.onChange(value === 'unassigned' ? null : value)} 
-                    defaultValue={field.value ?? 'unassigned'}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a user to assign the task" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="unassigned">Unassigned</SelectItem>
-                      {users.map((user) => (
-                        <SelectItem key={user.id} value={user.id}>
-                          <div className="flex items-center gap-2">
-                            <Avatar className="h-6 w-6">
-                                <AvatarImage src={`https://picsum.photos/seed/${user.id}/40/40`} alt={user.name} data-ai-hint="avatar" />
-                                <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
-                            </Avatar>
-                            <span>{user.name}</span>
-                           </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <FormField
@@ -214,7 +248,7 @@ export function NewTaskForm({ users }: NewTaskFormProps) {
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select a label" />
-                        </SelectTrigger>
+                        </Trigger>
                       </FormControl>
                       <SelectContent>
                         <SelectItem value="bug">Bug</SelectItem>

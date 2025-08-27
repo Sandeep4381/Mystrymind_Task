@@ -11,7 +11,7 @@ import {
   SidebarGroup,
   SidebarGroupLabel,
 } from '@/components/ui/sidebar';
-import { Rocket, LayoutDashboard, Users, ListTodo, LogOut } from 'lucide-react';
+import { Rocket, LayoutDashboard, Users, ListTodo, LogOut, Briefcase } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -28,6 +28,7 @@ export function SidebarNav({ session }: SidebarNavProps) {
 
   const navItems = [
     { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, visible: isAdmin },
+    { href: '/dashboard/projects', label: 'Projects', icon: Briefcase, visible: true },
     { href: '/dashboard/tasks', label: 'Tasks', icon: ListTodo, visible: true },
     { href: '/dashboard/users', label: 'Users', icon: Users, visible: isAdmin },
   ];
@@ -50,7 +51,7 @@ export function SidebarNav({ session }: SidebarNavProps) {
                 <SidebarMenuItem key={item.href}>
                   <SidebarMenuButton
                     asChild
-                    isActive={pathname === item.href}
+                    isActive={pathname.startsWith(item.href)}
                     tooltip={item.label}
                   >
                     <Link href={item.href}>

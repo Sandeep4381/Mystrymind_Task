@@ -17,6 +17,7 @@ const taskFormSchema = z.object({
   label: z.enum(['bug', 'feature', 'documentation']),
   priority: z.enum(['low', 'medium', 'high']),
   assigneeId: z.string().nullable(),
+  projectId: z.string().nullable(),
 });
 
 
