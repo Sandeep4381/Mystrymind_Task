@@ -16,5 +16,14 @@
     "position": "Full stack Mobile developer",
     "password": "Ajay@7463",
     "role": "Admin"
+  },
+  {
+    "id": "user-1756380895793",
+    "name": "Rohit",
+    "email": "rohit@gmail.com",
+    "mobile": "6299435686",
+    "position": "databse mangemnt",
+    "password": "Task@4381",
+    "role": "Admin"
   }
 ]
