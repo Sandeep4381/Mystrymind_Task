@@ -178,7 +178,7 @@ export function NewTaskForm({ users, projects }: NewTaskFormProps) {
                             <SelectItem key={user.id} value={user.id}>
                               <div className="flex items-center gap-2">
                                 <Avatar className="h-6 w-6">
-                                    <AvatarImage src={`https://picsum.photos/seed/${'\'\'\''}{user.id}/40/40`} alt={user.name} data-ai-hint="avatar" />
+                                    <AvatarImage src={`https://picsum.photos/seed/${user.id}/40/40`} alt={user.name} data-ai-hint="avatar" />
                                     <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
                                 </Avatar>
                                 <span>{user.name}</span>
