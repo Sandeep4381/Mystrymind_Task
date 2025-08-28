@@ -4,13 +4,10 @@
 import { z } from 'zod';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
-import { getTasks, writeJSONFile, getUserById, getProjectById } from '@/lib/data';
+import { getTasks, getUserById, getProjectById } from '@/lib/data';
 import { type Task } from '@/lib/definitions';
-import path from 'path';
 import { sendTaskAssignmentEmail } from '@/lib/email';
 import { getSession } from '@/lib/auth';
-
-const tasksFilePath = path.join(process.cwd(), 'data/tasks.json');
 
 const taskFormSchema = z.object({
   title: z.string().min(1, 'Title is required.'),
@@ -45,7 +42,11 @@ export async function createTask(values: z.infer<typeof taskFormSchema>) {
     };
 
     tasks.push(newTask);
-    await writeJSONFile(tasksFilePath, tasks);
+    
+    // This will now write to Redis via the data library
+    const { writeJSONFile } = await import('@/lib/data');
+    await writeJSONFile('tasks.json', tasks);
+
 
     if (newTask.assigneeId) {
       const assignedUser = await getUserById(newTask.assigneeId);

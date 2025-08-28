@@ -3,12 +3,8 @@
 
 import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
-import { getUsers, writeJSONFile, getUserByEmail } from '@/lib/data';
+import { getUsers, getUserByEmail } from '@/lib/data';
 import { getSession } from '@/lib/auth';
-import { type User } from '@/lib/definitions';
-import path from 'path';
-
-const usersFilePath = path.join(process.cwd(), 'data/users.json');
 
 const profileFormSchema = z.object({
   name: z.string().min(1, 'Name is required.'),
@@ -62,7 +58,8 @@ export async function updateProfile(values: z.infer<typeof profileFormSchema>) {
     
     users[userIndex] = updatedUser;
     
-    await writeJSONFile(usersFilePath, users);
+    const { writeJSONFile } = await import('@/lib/data');
+    await writeJSONFile('users.json', users);
 
   } catch (error) {
     console.error(error);

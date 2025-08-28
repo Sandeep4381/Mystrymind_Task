@@ -2,12 +2,8 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { getUsers, writeJSONFile, getTasks } from '@/lib/data';
+import { getUsers, getTasks } from '@/lib/data';
 import { getSession } from '@/lib/auth';
-import path from 'path';
-
-const usersFilePath = path.join(process.cwd(), 'data/users.json');
-const tasksFilePath = path.join(process.cwd(), 'data/tasks.json');
 
 export async function deleteUserAction(userId: string) {
     const session = await getSession();
@@ -36,7 +32,11 @@ export async function deleteUserAction(userId: string) {
         }
 
         const updatedUsers = users.filter(user => user.id !== userId);
-        await writeJSONFile(usersFilePath, updatedUsers);
+        
+        // This will now write to Redis via the data library
+        const { writeJSONFile } = await import('@/lib/data');
+        await writeJSONFile('users.json', updatedUsers);
+
 
         // Unassign tasks from the deleted user
         const tasks = await getTasks();
@@ -46,7 +46,7 @@ export async function deleteUserAction(userId: string) {
             }
             return task;
         });
-        await writeJSONFile(tasksFilePath, updatedTasks);
+        await writeJSONFile('tasks.json', updatedTasks);
 
     } catch (error) {
         console.error('Failed to delete user:', error);
