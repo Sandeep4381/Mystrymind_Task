@@ -19,11 +19,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import {
   Bug,
   CircleHelp,
@@ -35,16 +39,22 @@ import {
   ArrowDown,
   ArrowRight,
   ArrowUp,
-  MoreHorizontal,
+  Trash2,
+  Loader2,
+  Eye,
+  Pencil
 } from "lucide-react";
-import { type Task, type User, type SessionUser } from "@/lib/definitions";
+import { type Task, type User, type SessionUser, type Project } from "@/lib/definitions";
 import { useRouter } from "next/navigation";
-import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { deleteTaskAction } from "../actions";
+import { useToast } from "@/hooks/use-toast";
+import Link from "next/link";
+
 
 interface TasksDataTableProps {
-  tasks: Task[];
+  tasks: (Task & { project?: Project })[];
   users: User[];
   session: SessionUser;
 }
@@ -76,18 +86,46 @@ const getInitials = (name: string) => {
 
 export function TasksDataTable({ tasks, users, session }: TasksDataTableProps) {
   const router = useRouter();
+  const { toast } = useToast();
+  const [isPending, startTransition] = React.useTransition();
+  const [showDeleteDialog, setShowDeleteDialog] = React.useState(false);
+  const [taskToDelete, setTaskToDelete] = React.useState<Task | null>(null);
+
   const isAdmin = session.role === "Admin" || session.role === "Super Admin";
 
+  const handleDelete = () => {
+    if (!taskToDelete) return;
+    startTransition(async () => {
+        const result = await deleteTaskAction(taskToDelete.id);
+        if (result.error) {
+            toast({
+                variant: 'destructive',
+                title: 'Deletion Failed',
+                description: result.error,
+            });
+        } else {
+            toast({
+                title: 'Task Deleted',
+                description: `Task "${taskToDelete.title}" has been deleted.`,
+            });
+        }
+        setShowDeleteDialog(false);
+        setTaskToDelete(null);
+    });
+  };
+
   return (
+    <>
      <div className="rounded-md border bg-card">
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead>Task</TableHead>
+              <TableHead>Project</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Priority</TableHead>
               <TableHead>Assignee</TableHead>
-              {isAdmin && <TableHead className="text-right">Actions</TableHead>}
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -97,8 +135,6 @@ export function TasksDataTable({ tasks, users, session }: TasksDataTableProps) {
                 return (
                   <TableRow
                     key={task.id}
-                    className="cursor-pointer"
-                    onClick={() => router.push(`/dashboard/tasks/${task.id}`)}
                   >
                     <TableCell>
                       <div className="flex flex-col">
@@ -108,6 +144,15 @@ export function TasksDataTable({ tasks, users, session }: TasksDataTableProps) {
                            <span className="text-xs">{task.id}</span>
                         </div>
                       </div>
+                    </TableCell>
+                    <TableCell>
+                      {task.project ? (
+                        <Link href={`/dashboard/projects/${task.projectId}`} className="hover:underline">
+                          {task.project.name}
+                        </Link>
+                      ) : (
+                        <span className="text-muted-foreground">N/A</span>
+                      )}
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
@@ -121,7 +166,7 @@ export function TasksDataTable({ tasks, users, session }: TasksDataTableProps) {
                         <span>{task.priority}</span>
                       </div>
                     </TableCell>
-                    <TableCell onClick={(e) => e.stopPropagation()}>
+                    <TableCell>
                        <Select defaultValue={assignee?.id} disabled={!isAdmin}>
                         <SelectTrigger className="w-[180px]">
                            <div className="flex items-center gap-2">
@@ -153,28 +198,37 @@ export function TasksDataTable({ tasks, users, session }: TasksDataTableProps) {
                         </SelectContent>
                       </Select>
                     </TableCell>
-                    {isAdmin && (
-                        <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
-                           <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button variant="ghost" size="icon">
-                                        <MoreHorizontal className="h-4 w-4" />
-                                        <span className="sr-only">Task Actions</span>
-                                    </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                    <DropdownMenuItem>Edit</DropdownMenuItem>
-                                    <DropdownMenuItem className="text-destructive">Delete</DropdownMenuItem>
-                                </DropdownMenuContent>
-                           </DropdownMenu>
-                        </TableCell>
-                    )}
+                    <TableCell className="text-right">
+                       <div className="flex justify-end gap-2">
+                            <Button variant="outline" size="icon" onClick={() => router.push(`/dashboard/tasks/${task.id}`)}>
+                                <Eye className="h-4 w-4"/>
+                                <span className="sr-only">View Task</span>
+                            </Button>
+                            <Button variant="outline" size="icon" disabled={!isAdmin} onClick={() => router.push(`/dashboard/tasks/${task.id}/edit`)}>
+                                <Pencil className="h-4 w-4"/>
+                                <span className="sr-only">Edit Task</span>
+                            </Button>
+                            <Button 
+                                variant="destructive" 
+                                size="icon" 
+                                disabled={!isAdmin}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setTaskToDelete(task);
+                                    setShowDeleteDialog(true);
+                                }}
+                            >
+                                <Trash2 className="h-4 w-4"/>
+                                <span className="sr-only">Delete Task</span>
+                            </Button>
+                       </div>
+                    </TableCell>
                   </TableRow>
                 );
               })
             ) : (
               <TableRow>
-                <TableCell colSpan={isAdmin ? 5: 4} className="h-24 text-center">
+                <TableCell colSpan={6} className="h-24 text-center">
                   No tasks found.
                 </TableCell>
               </TableRow>
@@ -182,5 +236,28 @@ export function TasksDataTable({ tasks, users, session }: TasksDataTableProps) {
           </TableBody>
         </Table>
      </div>
+     <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+            <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+                This action cannot be undone. This will permanently delete the task
+                "{taskToDelete?.title}".
+            </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+                onClick={handleDelete}
+                disabled={isPending}
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+                {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Delete
+            </AlertDialogAction>
+            </AlertDialogFooter>
+        </AlertDialogContent>
+     </AlertDialog>
+    </>
   );
 }

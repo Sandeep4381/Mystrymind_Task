@@ -67,6 +67,24 @@ export async function getTaskById(taskId: string): Promise<Task | undefined> {
   return tasks.find(task => task.id === taskId);
 }
 
+export async function updateTask(taskId: string, taskData: Partial<Omit<Task, 'id'>>): Promise<Task> {
+    const tasks = await getTasks();
+    const taskIndex = tasks.findIndex(t => t.id === taskId);
+    if (taskIndex === -1) {
+        throw new Error("Task not found");
+    }
+    const updatedTask = { ...tasks[taskIndex], ...taskData };
+    tasks[taskIndex] = updatedTask;
+    await writeJSONFile(tasksFilePath, tasks);
+    return updatedTask;
+}
+
+export async function deleteTask(taskId: string): Promise<void> {
+    const tasks = await getTasks();
+    const updatedTasks = tasks.filter(task => task.id !== taskId);
+    await writeJSONFile(tasksFilePath, updatedTasks);
+}
+
 export async function getProjects(): Promise<Project[]> {
     const projects = await readJSONFile(projectsFilePath);
     return projects as Project[];
@@ -78,16 +96,41 @@ export async function getProjectById(projectId: string): Promise<Project | undef
 }
 
 
-export async function addProject(project: Omit<Project, 'id'>): Promise<Project> {
+export async function addProject(project: Omit<Project, 'id' | 'createdAt'>): Promise<Project> {
     const projects = await getProjects();
     const newProject: Project = {
         id: `project-${Date.now()}`,
+        createdAt: new Date().toISOString(),
         ...project
     };
     projects.push(newProject);
     await writeJSONFile(projectsFilePath, projects);
     return newProject;
 }
+
+export async function updateProject(projectId: string, projectData: Partial<Omit<Project, 'id'>>): Promise<Project> {
+    const projects = await getProjects();
+    const projectIndex = projects.findIndex(p => p.id === projectId);
+    if (projectIndex === -1) {
+        throw new Error("Project not found");
+    }
+    const updatedProject = { ...projects[projectIndex], ...projectData };
+    projects[projectIndex] = updatedProject;
+    await writeJSONFile(projectsFilePath, projects);
+    return updatedProject;
+}
+
+export async function deleteProject(projectId: string): Promise<void> {
+    const projects = await getProjects();
+    const updatedProjects = projects.filter(p => p.id !== projectId);
+    await writeJSONFile(projectsFilePath, updatedProjects);
+
+    // Also delete associated tasks
+    const tasks = await getTasks();
+    const updatedTasks = tasks.filter(t => t.projectId !== projectId);
+    await writeJSONFile(tasksFilePath, updatedTasks);
+}
+
 
 export async function getMilestones(projectId: string): Promise<Milestone[]> {
     const milestones = await readJSONFile(milestonesFilePath);

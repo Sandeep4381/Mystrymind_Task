@@ -26,16 +26,16 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { useTransition } from 'react';
 import { Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { createTask } from '../actions';
-import { type User, type Project } from '@/lib/definitions';
+import { updateTaskAction } from './actions';
+import { type User, type Project, type Task } from '@/lib/definitions';
 import { useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 
-interface NewTaskFormProps {
+interface EditTaskPageProps {
+    task: Task;
     users: User[];
     projects: Project[];
-    projectId?: string;
 }
 
 const taskFormSchema = z.object({
@@ -54,7 +54,7 @@ const getInitials = (name: string) => {
 }
 
 
-export function NewTaskForm({ users, projects, projectId }: NewTaskFormProps) {
+export default function EditTaskPage({ task, users, projects }: EditTaskPageProps) {
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
   const router = useRouter();
@@ -62,32 +62,32 @@ export function NewTaskForm({ users, projects, projectId }: NewTaskFormProps) {
   const form = useForm<z.infer<typeof taskFormSchema>>({
     resolver: zodResolver(taskFormSchema),
     defaultValues: {
-      title: '',
-      description: '',
-      status: 'Todo',
-      label: 'feature',
-      priority: 'medium',
-      assigneeId: null,
-      projectId: projectId || undefined,
+      title: task.title,
+      description: task.description,
+      status: task.status,
+      label: task.label,
+      priority: task.priority,
+      assigneeId: task.assigneeId,
+      projectId: task.projectId,
     },
   });
 
   async function onSubmit(values: z.infer<typeof taskFormSchema>) {
     startTransition(async () => {
-      const result = await createTask({
+       const result = await updateTaskAction(task.id, {
         ...values,
         assigneeId: values.assigneeId === 'unassigned' ? null : values.assigneeId,
       });
        if (result?.error) {
         toast({
           variant: 'destructive',
-          title: 'Task Creation Failed',
+          title: 'Task Update Failed',
           description: result.error,
         });
       } else {
         toast({
-          title: 'Task Created',
-          description: 'The new task has been successfully created.',
+          title: 'Task Updated',
+          description: 'The task has been successfully updated.',
         });
       }
     });
@@ -96,8 +96,8 @@ export function NewTaskForm({ users, projects, projectId }: NewTaskFormProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Create New Task</CardTitle>
-        <CardDescription>Fill out the form below to create a new task.</CardDescription>
+        <CardTitle>Edit Task</CardTitle>
+        <CardDescription>Update the details of the task below.</CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -139,7 +139,6 @@ export function NewTaskForm({ users, projects, projectId }: NewTaskFormProps) {
                       <Select
                         onValueChange={field.onChange}
                         defaultValue={field.value ?? undefined}
-                        disabled={!!projectId}
                       >
                         <FormControl>
                           <SelectTrigger>
@@ -165,8 +164,8 @@ export function NewTaskForm({ users, projects, projectId }: NewTaskFormProps) {
                     <FormItem>
                       <FormLabel>Assign To</FormLabel>
                       <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value ?? undefined}
+                        onValue-change={field.onChange}
+                        defaultValue={field.value ?? "unassigned"}
                       >
                         <FormControl>
                           <SelectTrigger>
@@ -270,7 +269,7 @@ export function NewTaskForm({ users, projects, projectId }: NewTaskFormProps) {
               <Button type="button" variant="outline" onClick={() => router.back()}>Cancel</Button>
               <Button type="submit" disabled={isPending}>
                 {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Create Task
+                Save Changes
               </Button>
             </div>
           </form>

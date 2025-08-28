@@ -13,6 +13,9 @@ export type Project = {
     id: string;
     name: string;
     description: string;
+    createdAt: string; // ISO 8601 date string
+    completedAt?: string | null; // ISO 8601 date string
+    createdById: string;
 };
 
 export type Milestone = {
@@ -26,12 +29,12 @@ export type Milestone = {
 export type Task = {
   id: string;
   title: string;
-  description: string;
+  description:string;
   status: 'Backlog' | 'Todo' | 'In Progress' | 'Done' | 'Canceled';
   label: 'bug' | 'feature' | 'documentation';
   priority: 'low' | 'medium' | 'high';
   assigneeId: string | null;
-  projectId: string | null;
+  projectId: string;
 };
 
 export type Comment = {

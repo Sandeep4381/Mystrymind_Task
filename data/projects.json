@@ -1,1 +1,14 @@
-[]
+[
+  {
+    "id": "project-1756377189677",
+    "name": "MystryMind_Website",
+    "description": "hello team "
+  },
+  {
+    "id": "project-1756377867442",
+    "createdAt": "2025-08-28T10:44:27.442Z",
+    "name": "web -Intern",
+    "description": "task for intern ",
+    "createdById": "user-1718886948052"
+  }
+]

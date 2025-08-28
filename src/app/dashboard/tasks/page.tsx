@@ -1,20 +1,29 @@
 
-import { getTasks, getUsers } from "@/lib/data";
+import { getTasks, getUsers, getProjects } from "@/lib/data";
 import { TasksDataTable } from "./components/data-table";
 import { getSession } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { PlusCircle } from "lucide-react";
 import Link from "next/link";
+import { type Task, type Project } from "@/lib/definitions";
 
 export default async function TasksPage() {
-  const tasks = await getTasks();
-  const users = await getUsers();
+  const allTasks = await getTasks();
+  const allUsers = await getUsers();
+  const allProjects = await getProjects();
   const session = await getSession();
 
   if (!session) return null;
 
+  const projectMap = new Map(allProjects.map(p => [p.id, p]));
+
+  const tasksWithProjects = allTasks.map(task => ({
+    ...task,
+    project: projectMap.get(task.projectId),
+  }));
+
   const isAdmin = session.role === "Admin" || session.role === "Super Admin";
-  const userTasks = isAdmin ? tasks : tasks.filter(task => task.assigneeId === session.id);
+  const userTasks = isAdmin ? tasksWithProjects : tasksWithProjects.filter(task => task.assigneeId === session.id);
 
   return (
     <div className="space-y-6">
@@ -25,16 +34,8 @@ export default async function TasksPage() {
              {isAdmin ? "Here's a list of all tasks in the system." : "Here are the tasks assigned to you."}
            </p>
          </div>
-         {isAdmin && (
-            <Button asChild>
-                <Link href="/dashboard/tasks/new">
-                    <PlusCircle className="mr-2 h-4 w-4" />
-                    Add Task
-                </Link>
-            </Button>
-         )}
        </div>
-       <TasksDataTable tasks={userTasks} users={users} session={session}/>
+       <TasksDataTable tasks={userTasks} users={allUsers} session={session}/>
     </div>
   );
 }
