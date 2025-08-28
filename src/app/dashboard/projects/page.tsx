@@ -49,9 +49,11 @@ export default async function ProjectsPage() {
                                <p className="text-sm text-muted-foreground">
                                  Created by: {userMap.get(project.createdById) ?? 'Unknown User'}
                                </p>
-                               <p className="text-sm text-muted-foreground">
-                                 Created on: {format(new Date(project.createdAt), 'PPP')}
-                               </p>
+                               {project.createdAt && (
+                                <p className="text-sm text-muted-foreground">
+                                    Created on: {format(new Date(project.createdAt), 'PPP')}
+                                </p>
+                               )}
                                {project.completedAt && (
                                 <p className="text-sm text-muted-foreground">
                                     Completed on: {format(new Date(project.completedAt), 'PPP')}
