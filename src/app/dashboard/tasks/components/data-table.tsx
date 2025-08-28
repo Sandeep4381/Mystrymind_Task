@@ -19,12 +19,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
     AlertDialog,
     AlertDialogAction,
     AlertDialogCancel,
@@ -45,13 +39,13 @@ import {
   ArrowDown,
   ArrowRight,
   ArrowUp,
-  MoreHorizontal,
   Trash2,
-  Loader2
+  Loader2,
+  Eye,
+  Pencil
 } from "lucide-react";
 import { type Task, type User, type SessionUser } from "@/lib/definitions";
 import { useRouter } from "next/navigation";
-import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { deleteTaskAction } from "../actions";
@@ -129,7 +123,7 @@ export function TasksDataTable({ tasks, users, session }: TasksDataTableProps) {
               <TableHead>Status</TableHead>
               <TableHead>Priority</TableHead>
               <TableHead>Assignee</TableHead>
-              {isAdmin && <TableHead className="text-right">Actions</TableHead>}
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -139,8 +133,6 @@ export function TasksDataTable({ tasks, users, session }: TasksDataTableProps) {
                 return (
                   <TableRow
                     key={task.id}
-                    className="cursor-pointer"
-                    onClick={() => router.push(`/dashboard/tasks/${task.id}`)}
                   >
                     <TableCell>
                       <div className="flex flex-col">
@@ -163,7 +155,7 @@ export function TasksDataTable({ tasks, users, session }: TasksDataTableProps) {
                         <span>{task.priority}</span>
                       </div>
                     </TableCell>
-                    <TableCell onClick={(e) => e.stopPropagation()}>
+                    <TableCell>
                        <Select defaultValue={assignee?.id} disabled={!isAdmin}>
                         <SelectTrigger className="w-[180px]">
                            <div className="flex items-center gap-2">
@@ -195,38 +187,37 @@ export function TasksDataTable({ tasks, users, session }: TasksDataTableProps) {
                         </SelectContent>
                       </Select>
                     </TableCell>
-                    {isAdmin && (
-                        <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
-                           <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button variant="ghost" size="icon">
-                                        <MoreHorizontal className="h-4 w-4" />
-                                        <span className="sr-only">Task Actions</span>
-                                    </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                    <DropdownMenuItem>Edit</DropdownMenuItem>
-                                    <DropdownMenuItem 
-                                        className="text-destructive"
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            setTaskToDelete(task);
-                                            setShowDeleteDialog(true);
-                                        }}
-                                    >
-                                        <Trash2 className="mr-2 h-4 w-4"/>
-                                        Delete
-                                    </DropdownMenuItem>
-                                </DropdownMenuContent>
-                           </DropdownMenu>
-                        </TableCell>
-                    )}
+                    <TableCell className="text-right">
+                       <div className="flex justify-end gap-2">
+                            <Button variant="outline" size="icon" onClick={() => router.push(`/dashboard/tasks/${task.id}`)}>
+                                <Eye className="h-4 w-4"/>
+                                <span className="sr-only">View Task</span>
+                            </Button>
+                            <Button variant="outline" size="icon" disabled={!isAdmin} onClick={() => router.push(`/dashboard/tasks/${task.id}/edit`)}>
+                                <Pencil className="h-4 w-4"/>
+                                <span className="sr-only">Edit Task</span>
+                            </Button>
+                            <Button 
+                                variant="destructive" 
+                                size="icon" 
+                                disabled={!isAdmin}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setTaskToDelete(task);
+                                    setShowDeleteDialog(true);
+                                }}
+                            >
+                                <Trash2 className="h-4 w-4"/>
+                                <span className="sr-only">Delete Task</span>
+                            </Button>
+                       </div>
+                    </TableCell>
                   </TableRow>
                 );
               })
             ) : (
               <TableRow>
-                <TableCell colSpan={isAdmin ? 5: 4} className="h-24 text-center">
+                <TableCell colSpan={5} className="h-24 text-center">
                   No tasks found.
                 </TableCell>
               </TableRow>

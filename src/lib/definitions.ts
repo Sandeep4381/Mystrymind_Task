@@ -13,6 +13,9 @@ export type Project = {
     id: string;
     name: string;
     description: string;
+    createdAt: string; // ISO 8601 date string
+    completedAt?: string | null; // ISO 8601 date string
+    createdById: string;
 };
 
 export type Milestone = {
