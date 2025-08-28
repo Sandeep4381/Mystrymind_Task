@@ -2,9 +2,8 @@
 'use server';
 
 import { z } from 'zod';
-import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
-import { addProject } from '@/lib/data';
+import { updateProject } from '@/lib/data';
 import { getSession } from '@/lib/auth';
 
 const projectFormSchema = z.object({
@@ -13,10 +12,10 @@ const projectFormSchema = z.object({
 });
 
 
-export async function createProject(values: z.infer<typeof projectFormSchema>) {
+export async function updateProjectAction(projectId: string, values: z.infer<typeof projectFormSchema>) {
   const session = await getSession();
   if (!session) {
-    return { error: 'You must be logged in to create a project.' };
+    return { error: 'You must be logged in to update a project.' };
   }
   
   const parsedProject = projectFormSchema.safeParse(values);
@@ -26,16 +25,14 @@ export async function createProject(values: z.infer<typeof projectFormSchema>) {
   }
 
   try {
-    await addProject({
-      ...parsedProject.data,
-      createdById: session.id,
-    });
+    await updateProject(projectId, parsedProject.data);
 
   } catch (error) {
     console.error(error);
-    return { error: 'Failed to create project.' };
+    return { error: 'Failed to update project.' };
   }
 
   revalidatePath('/dashboard/projects');
-  redirect('/dashboard/projects');
+  revalidatePath(`/dashboard/projects/${projectId}`);
+  return { success: true };
 }
