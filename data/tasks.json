@@ -8,5 +8,15 @@
     "priority": "high",
     "assigneeId": "user-1756291060094",
     "projectId": null
+  },
+  {
+    "id": "task-1756377655621",
+    "title": "deployed code on staging server",
+    "description": "do fast",
+    "status": "In Progress",
+    "label": "feature",
+    "priority": "high",
+    "assigneeId": "user-1756291060094",
+    "projectId": "project-1756377189677"
   }
 ]

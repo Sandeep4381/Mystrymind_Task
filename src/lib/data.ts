@@ -67,6 +67,18 @@ export async function getTaskById(taskId: string): Promise<Task | undefined> {
   return tasks.find(task => task.id === taskId);
 }
 
+export async function updateTask(taskId: string, taskData: Partial<Omit<Task, 'id'>>): Promise<Task> {
+    const tasks = await getTasks();
+    const taskIndex = tasks.findIndex(t => t.id === taskId);
+    if (taskIndex === -1) {
+        throw new Error("Task not found");
+    }
+    const updatedTask = { ...tasks[taskIndex], ...taskData };
+    tasks[taskIndex] = updatedTask;
+    await writeJSONFile(tasksFilePath, tasks);
+    return updatedTask;
+}
+
 export async function deleteTask(taskId: string): Promise<void> {
     const tasks = await getTasks();
     const updatedTasks = tasks.filter(task => task.id !== taskId);

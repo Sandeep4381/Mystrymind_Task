@@ -44,16 +44,17 @@ import {
   Eye,
   Pencil
 } from "lucide-react";
-import { type Task, type User, type SessionUser } from "@/lib/definitions";
+import { type Task, type User, type SessionUser, type Project } from "@/lib/definitions";
 import { useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { deleteTaskAction } from "../actions";
 import { useToast } from "@/hooks/use-toast";
+import Link from "next/link";
 
 
 interface TasksDataTableProps {
-  tasks: Task[];
+  tasks: (Task & { project?: Project })[];
   users: User[];
   session: SessionUser;
 }
@@ -120,6 +121,7 @@ export function TasksDataTable({ tasks, users, session }: TasksDataTableProps) {
           <TableHeader>
             <TableRow>
               <TableHead>Task</TableHead>
+              <TableHead>Project</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Priority</TableHead>
               <TableHead>Assignee</TableHead>
@@ -142,6 +144,15 @@ export function TasksDataTable({ tasks, users, session }: TasksDataTableProps) {
                            <span className="text-xs">{task.id}</span>
                         </div>
                       </div>
+                    </TableCell>
+                    <TableCell>
+                      {task.project ? (
+                        <Link href={`/dashboard/projects/${task.projectId}`} className="hover:underline">
+                          {task.project.name}
+                        </Link>
+                      ) : (
+                        <span className="text-muted-foreground">N/A</span>
+                      )}
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
@@ -217,7 +228,7 @@ export function TasksDataTable({ tasks, users, session }: TasksDataTableProps) {
               })
             ) : (
               <TableRow>
-                <TableCell colSpan={5} className="h-24 text-center">
+                <TableCell colSpan={6} className="h-24 text-center">
                   No tasks found.
                 </TableCell>
               </TableRow>

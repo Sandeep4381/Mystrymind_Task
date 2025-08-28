@@ -7,6 +7,7 @@ import Link from "next/link";
 import { PlusCircle } from "lucide-react";
 import { TasksDataTable } from "../../tasks/components/data-table";
 import { getSession } from "@/lib/auth";
+import { type Project } from "@/lib/definitions";
 
 export default async function ProjectDetailPage({ params }: { params: { id: string } }) {
   const project = await getProjectById(params.id);
@@ -20,8 +21,10 @@ export default async function ProjectDetailPage({ params }: { params: { id: stri
   const allUsers = await getUsers();
 
   const projectTasks = allTasks.filter(task => task.projectId === project.id);
+  const tasksWithProjectData = projectTasks.map(task => ({...task, project}));
+  
   const isAdmin = session.role === "Admin" || session.role === "Super Admin";
-  const userTasks = isAdmin ? projectTasks : projectTasks.filter(task => task.assigneeId === session.id);
+  const userTasks = isAdmin ? tasksWithProjectData : tasksWithProjectData.filter(task => task.assigneeId === session.id);
 
 
   return (
