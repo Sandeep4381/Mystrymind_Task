@@ -25,14 +25,6 @@ export default async function TasksPage() {
              {isAdmin ? "Here's a list of all tasks in the system." : "Here are the tasks assigned to you."}
            </p>
          </div>
-         {isAdmin && (
-            <Button asChild>
-                <Link href="/dashboard/tasks/new">
-                    <PlusCircle className="mr-2 h-4 w-4" />
-                    Add Task
-                </Link>
-            </Button>
-         )}
        </div>
        <TasksDataTable tasks={userTasks} users={users} session={session}/>
     </div>

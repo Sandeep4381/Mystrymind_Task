@@ -1,3 +1,4 @@
+
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -34,6 +35,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 interface NewTaskFormProps {
     users: User[];
     projects: Project[];
+    projectId?: string;
 }
 
 const taskFormSchema = z.object({
@@ -43,7 +45,7 @@ const taskFormSchema = z.object({
   label: z.enum(['bug', 'feature', 'documentation']),
   priority: z.enum(['low', 'medium', 'high']),
   assigneeId: z.string().nullable(),
-  projectId: z.string().nullable(),
+  projectId: z.string({ required_error: 'Project is required.' }).min(1, 'Project is required.'),
 });
 
 const getInitials = (name: string) => {
@@ -52,7 +54,7 @@ const getInitials = (name: string) => {
 }
 
 
-export function NewTaskForm({ users, projects }: NewTaskFormProps) {
+export function NewTaskForm({ users, projects, projectId }: NewTaskFormProps) {
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
   const router = useRouter();
@@ -66,7 +68,7 @@ export function NewTaskForm({ users, projects }: NewTaskFormProps) {
       label: 'feature',
       priority: 'medium',
       assigneeId: null,
-      projectId: null,
+      projectId: projectId || undefined,
     },
   });
 
@@ -74,7 +76,6 @@ export function NewTaskForm({ users, projects }: NewTaskFormProps) {
     startTransition(async () => {
       const result = await createTask({
         ...values,
-        projectId: values.projectId === 'unassigned' ? null : values.projectId,
         assigneeId: values.assigneeId === 'unassigned' ? null : values.assigneeId,
       });
        if (result?.error) {
@@ -138,6 +139,7 @@ export function NewTaskForm({ users, projects }: NewTaskFormProps) {
                       <Select
                         onValueChange={field.onChange}
                         defaultValue={field.value ?? undefined}
+                        disabled={!!projectId}
                       >
                         <FormControl>
                           <SelectTrigger>
@@ -145,7 +147,6 @@ export function NewTaskForm({ users, projects }: NewTaskFormProps) {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="unassigned">No Project</SelectItem>
                           {projects.map((project) => (
                             <SelectItem key={project.id} value={project.id}>
                               {project.name}
@@ -227,9 +228,10 @@ export function NewTaskForm({ users, projects }: NewTaskFormProps) {
                     <FormLabel>Priority</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a priority" />
-                        </Trigger>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a priority" />
+                      </SelectTrigger>
+
                       </FormControl>
                       <SelectContent>
                         <SelectItem value="low">Low</SelectItem>
@@ -251,7 +253,7 @@ export function NewTaskForm({ users, projects }: NewTaskFormProps) {
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select a label" />
-                        </Trigger>
+                        </SelectTrigger>
                       </FormControl>
                       <SelectContent>
                         <SelectItem value="bug">Bug</SelectItem>
